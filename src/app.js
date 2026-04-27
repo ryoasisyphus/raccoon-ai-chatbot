@@ -268,10 +268,21 @@ window.sendMessage = function() {
 
 function processResponse(text) {
     // 1. 精準 FAQ
-    let found = FAQ.find(f => f.keywords.some(k => text.includes(k)));
+    let found = FAQ.find(f => f.keywords && f.keywords.some(k => text.includes(k)));
     if (found) {
         failCount = 0;
-        appendMessage('ai', found.answer);
+        let answerText = found.answer;
+        let isHtml = false;
+        
+        // 檢查回覆中是否包含引導轉接真人的關鍵字
+        if (answerText.includes('轉接真人')) {
+            answerText += `<br><br><div class="handover-card">
+                            <button class="handover-btn" onclick="triggerHandover()">轉接真人專員</button>
+                         </div>`;
+            isHtml = true;
+        }
+
+        appendMessage('ai', answerText, isHtml);
         return;
     }
 
