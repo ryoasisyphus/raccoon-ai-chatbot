@@ -28,7 +28,7 @@ let PRODUCTS = [
 
 // --- 資料庫設定 ---
 // 在這裡填入你發佈的 Google Apps Script Web App URL
-const GAS_API_URL = ""; 
+const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxWEcFhQ5xo2g88PYuRr-wbhpPYahJTqfnYGMwj_y8-SpQq4_m8t2OBre_d_58Yw2EUhg/exec"; 
 
 let failCount = 0;
 let currentProduct = null; // 追蹤當前選取的商品
