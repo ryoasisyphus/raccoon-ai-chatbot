@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raccoon AI Assistant | 智能客服原型</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&family=Noto+Sans+TC:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- 引入外部樣式表 -->
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+
+<div id="app-container">
+    <header>
+        <div class="avatar">🦝</div>
+        <div class="header-info">
+            <h1>Raccoon Assistant</h1>
+            <p>● 智能助手在線中</p>
+        </div>
+    </header>
+
+    <div id="chat-window">
+        <!-- Welcome Screen -->
+        <div id="welcome-screen">
+            <img src="static/concept.png" alt="Raccoon Assistant" class="concept-img">
+            <h2 class="welcome-title">哈囉！我是 Raccoon</h2>
+            <p class="welcome-desc">
+                您的專屬智能生活助手。您可以詢問我關於**訂單進度、運費優惠、商品推薦**，或是讓我幫您挑選適合的禮物。
+                <br><br>
+                隨時輸入任何問題，我會盡力為您解答！
+            </p>
+        </div>
+    </div>
+
+    <div id="typing-indicator">Raccoon 正在輸入中...</div>
+
+    <div class="quick-actions">
+        <div class="action-chip" onclick="handleQuickAction('最新優惠活動')">🎁 最新優惠</div>
+        <div class="action-chip" onclick="handleQuickAction('如何追蹤訂單')">📦 訂單查詢</div>
+        <div class="action-chip" onclick="handleQuickAction('我想挑選禮物')">✨ 禮物推薦</div>
+        <div class="action-chip" onclick="handleQuickAction('會員等級說明')">💎 會員權益</div>
+        <div class="action-chip" onclick="handleQuickAction('運費怎麼算')">🚚 運費資訊</div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="user-input" placeholder="跟我說點什麼吧..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button id="send-btn" onclick="sendMessage()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+    </div>
+</div>
+
+<!-- 引入外部邏輯腳本 -->
+<script src="src/app.js"></script>
+
+</body>
+</html>
