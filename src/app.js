@@ -16,6 +16,19 @@ const chatWindow = document.getElementById('chat-window');
 const welcomeScreen = document.getElementById('welcome-screen');
 const userInput = document.getElementById('user-input');
 
+// 0. 深色模式手動切換
+window.toggleTheme = function() {
+    const body = document.body;
+    const currentTheme = body.getAttribute('data-theme');
+    if (currentTheme === 'dark') {
+        body.removeAttribute('data-theme');
+        localStorage.setItem('raccoon_theme', 'light');
+    } else {
+        body.setAttribute('data-theme', 'dark');
+        localStorage.setItem('raccoon_theme', 'dark');
+    }
+};
+
 const PLACEHOLDERS = [
     "跟我說點什麼吧...",
     "試試看：運費怎麼算？",
@@ -34,6 +47,10 @@ function startPlaceholderRotation() {
 
 // 1. 初始化：載入歷史紀錄與啟動佔位符輪播
 window.onload = () => {
+    // 恢復主題
+    const savedTheme = localStorage.getItem('raccoon_theme');
+    if (savedTheme === 'dark') document.body.setAttribute('data-theme', 'dark');
+    
     startPlaceholderRotation();
     const history = JSON.parse(localStorage.getItem('raccoon_chat_history') || '[]');
     if (history.length > 0) {

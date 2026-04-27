@@ -12,7 +12,7 @@
     --shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.1);
 }
 
-/* 深色模式變數 */
+/* 深色模式變數 (支援自動偵測與手動切換) */
 @media (prefers-color-scheme: dark) {
     :root {
         --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -23,6 +23,18 @@
         --card-bg: #1e293b;
         --border: #334155;
     }
+}
+
+body[data-theme="dark"] {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    --glass-bg: rgba(30, 41, 59, 0.85);
+    --text-main: #f1f5f9;
+    --text-muted: #94a3b8;
+    --ai-bubble: #334155;
+    --card-bg: #1e293b;
+    --border: #334155;
+    background: var(--bg-gradient);
+    color: var(--text-main);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
