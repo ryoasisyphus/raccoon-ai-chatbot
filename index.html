@@ -42,12 +42,21 @@
         </div>
     </div>
 
+    <div class="category-tabs" style="padding: 10px 24px 0; display: flex; gap: 15px; overflow-x: auto; -ms-overflow-style: none; scrollbar-width: none; border-bottom: 1px solid var(--border);">
+        <button class="tab-btn active" onclick="switchCategory(this, 'all')">全部</button>
+        <button class="tab-btn" onclick="switchCategory(this, 'order')">物流售後</button>
+        <button class="tab-btn" onclick="switchCategory(this, 'member')">會員優惠</button>
+        <button class="tab-btn" onclick="switchCategory(this, 'product')">購物推薦</button>
+    </div>
+
     <div class="quick-actions">
-        <div class="action-chip" onclick="handleQuickAction('最新優惠活動')">🎁 最新優惠</div>
-        <div class="action-chip" onclick="handleQuickAction('如何追蹤訂單')">📦 訂單查詢</div>
-        <div class="action-chip" onclick="handleQuickAction('我想挑選禮物')">✨ 禮物推薦</div>
-        <div class="action-chip" onclick="handleQuickAction('會員等級說明')">💎 會員權益</div>
-        <div class="action-chip" onclick="handleQuickAction('運費怎麼算')">🚚 運費資訊</div>
+        <div class="action-chip" data-cat="member" onclick="handleQuickAction('最新優惠活動')">🎁 最新優惠</div>
+        <div class="action-chip" data-cat="order" onclick="handleQuickAction('如何追蹤訂單')">📦 訂單查詢</div>
+        <div class="action-chip" data-cat="product" onclick="handleQuickAction('我想挑選禮物')">✨ 禮物推薦</div>
+        <div class="action-chip" data-cat="member" onclick="handleQuickAction('會員等級說明')">💎 會員權益</div>
+        <div class="action-chip" data-cat="order" onclick="handleQuickAction('運費怎麼算')">🚚 運費資訊</div>
+        <div class="action-chip" data-cat="order" onclick="handleQuickAction('如何退換貨')">🔄 退換貨流程</div>
+        <div class="action-chip" data-cat="product" onclick="handleQuickAction('科技酷玩推薦')">🎧 科技周邊</div>
     </div>
 
     <div class="input-area">
@@ -61,6 +70,20 @@
 
 <!-- 引入外部邏輯腳本 -->
 <script src="src/app.js"></script>
+
+<!-- 商品詳情微彈窗 (Product Modal) -->
+<div id="product-modal" class="modal-overlay" style="display:none;" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <img id="modal-img" src="" alt="商品圖片">
+        <div class="modal-info">
+            <h3 id="modal-title">商品名稱</h3>
+            <div id="modal-price" class="product-price">NT$ 0</div>
+            <p id="modal-desc">商品描述內容</p>
+            <button class="add-to-cart-btn" onclick="alert('已模擬加入購物車！🛒')">加入購物車</button>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>
