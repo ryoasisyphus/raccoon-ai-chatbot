@@ -27,6 +27,7 @@ const PRODUCTS = [
 ];
 
 let failCount = 0;
+let currentProduct = null; // 追蹤當前選取的商品
 const chatWindow = document.getElementById('chat-window');
 const welcomeScreen = document.getElementById('welcome-screen');
 const userInput = document.getElementById('user-input');
@@ -173,6 +174,7 @@ window.viewProductDetail = function(productId) {
     const product = PRODUCTS.find(p => p.id === productId);
     if (!product) return;
 
+    currentProduct = product; // 記錄當前商品
     document.getElementById('modal-img').src = product.image;
     document.getElementById('modal-title').textContent = product.name;
     document.getElementById('modal-price').textContent = `NT$ ${product.price}`;
@@ -182,6 +184,43 @@ window.viewProductDetail = function(productId) {
 
 window.closeModal = function() {
     document.getElementById('product-modal').style.display = 'none';
+};
+
+// --- 結帳流程 ---
+window.goToCheckout = function() {
+    if (!currentProduct) return;
+    
+    // 關閉商品彈窗
+    closeModal();
+    
+    // 填入結帳頁面資料
+    document.getElementById('checkout-img').src = currentProduct.image;
+    document.getElementById('checkout-title').textContent = currentProduct.name;
+    document.getElementById('checkout-price').textContent = `NT$ ${currentProduct.price}`;
+    document.getElementById('checkout-total').textContent = `NT$ ${currentProduct.price}`;
+    
+    // 顯示結帳畫面
+    document.getElementById('checkout-screen').style.display = 'flex';
+};
+
+window.closeCheckout = function() {
+    document.getElementById('checkout-screen').style.display = 'none';
+};
+
+window.submitOrder = function() {
+    const btn = document.querySelector('.confirm-order-btn');
+    btn.textContent = '處理中...';
+    btn.style.opacity = '0.7';
+    
+    setTimeout(() => {
+        closeCheckout();
+        btn.textContent = '確認結帳';
+        btn.style.opacity = '1';
+        
+        // 返回聊天室並給予成功回饋
+        appendMessage('ai', `🎉 <b>訂單成立！</b><br>您訂購的「${currentProduct.name}」已成功結帳。<br>訂單編號：#RCN-${Math.floor(Math.random() * 10000)}<br>您可隨時詢問我訂單進度喔！`, true);
+        currentProduct = null;
+    }, 1500);
 };
 
 // 6. 快捷操作與發送邏輯
