@@ -2,6 +2,11 @@
 
 本專案遵循「易用性優先」的原則進行開發。以下是本開發階段的所有變更紀錄：
 
+## [v1.5.1] - 2026-04-27
+### 🤖 LLM 效能最佳化 (Token Optimization)
+- **[文件]** 重構內部工程文件 (`product_spec.md`, `developer_guide.md`, `Skill.md`) 為高度壓縮的 XML/YAML 混合標籤格式。
+- **[目的]** 大幅降低 AI 讀取專案規範時的 Token 消耗，並藉由嚴格的結構化提升 AI 輸出代碼的精準度與一致性。
+
 ## [v1.5.0] - 2026-04-27 (當前版本)
 ### ☁️ 無伺服器架構與動態邏輯升級 (Serverless & Dynamic Logic)
 - **[架構]** 整合 **Google Sheets Serverless API**：將知識庫從靜態 JSON 升級為由 Google Apps Script 驅動的動態資料庫，實現免發布即可更新內容。
