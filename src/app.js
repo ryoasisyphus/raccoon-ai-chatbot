@@ -1,4 +1,4 @@
-const FAQ = [
+let FAQ = [
     // 物流與運費
     { keywords: ['運費', '郵資', '免運'], answer: "全站訂單滿 **NT$1,000** 即享免運！未達門檻一般宅配運費為 NT$80，超商取貨為 NT$60。" },
     { keywords: ['訂單', '追蹤', '進度', '出貨'], answer: "您可以至「個人中心 > 我的訂單」查看即時物流狀態。一般商品發貨後約 2-3 個工作天送達。" },
@@ -17,7 +17,7 @@ const FAQ = [
     { keywords: ['生日禮', '壽星'], answer: "當月壽星將獲得專屬 NT$200 折價券，並享有單筆訂單點數雙倍回饋！請確保您已填寫完整會員資料。" }
 ];
 
-const PRODUCTS = [
+let PRODUCTS = [
     { id: 'p1', name: "極簡質感保溫瓶", price: 880, category: "居家生活", desc: "304 不鏽鋼材質，長效保溫保冷 12 小時。霧面烤漆提升質感。", image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?auto=format&fit=crop&q=80&w=200&h=200" },
     { id: 'p2', name: "降噪真無線耳機", price: 2480, category: "科技酷玩", desc: "主動降噪技術，沉浸式聽覺體驗。單次續航 8 小時，支援無線充電。", image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?auto=format&fit=crop&q=80&w=200&h=200" },
     { id: 'p3', name: "智能氣氛燈", price: 1200, category: "科技酷玩", desc: "聲控切換 1600 萬色，支援 APP 遠端控制。打造專屬居家氛圍。", image: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?auto=format&fit=crop&q=80&w=200&h=200" },
@@ -25,6 +25,10 @@ const PRODUCTS = [
     { id: 'p5', name: "輕量防潑水後背包", price: 1580, category: "戶外休閒", desc: "多夾層設計，可容納 15 吋筆電。防潑水材質，通勤出遊皆宜。", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=200&h=200" },
     { id: 'p6', name: "香氛蠟燭禮盒", price: 1280, category: "禮品精選", desc: "三種經典木質香調。天然大豆蠟，燃燒無黑煙，放鬆身心靈。", image: "https://images.unsplash.com/photo-1603006905003-be475563bc59?auto=format&fit=crop&q=80&w=200&h=200" }
 ];
+
+// --- 資料庫設定 ---
+// 在這裡填入你發佈的 Google Apps Script Web App URL
+const GAS_API_URL = ""; 
 
 let failCount = 0;
 let currentProduct = null; // 追蹤當前選取的商品
@@ -63,11 +67,28 @@ function startPlaceholderRotation() {
 }
 
 // 1. 初始化
-window.onload = () => {
+window.onload = async () => {
     const savedTheme = localStorage.getItem('raccoon_theme');
     if (savedTheme === 'dark') document.body.setAttribute('data-theme', 'dark');
     
     startPlaceholderRotation();
+    
+    // 如果有設定 GAS API，嘗試抓取遠端資料庫
+    if (GAS_API_URL) {
+        try {
+            document.getElementById('typing-indicator').style.display = 'flex';
+            const response = await fetch(GAS_API_URL);
+            const data = await response.json();
+            if (data.faq && data.faq.length > 0) FAQ = data.faq;
+            if (data.products && data.products.length > 0) PRODUCTS = data.products;
+            document.getElementById('typing-indicator').style.display = 'none';
+            console.log('✅ 成功從 Google Sheets 載入資料庫！');
+        } catch (error) {
+            console.error('❌ 資料庫載入失敗，使用本地備用資料。', error);
+            document.getElementById('typing-indicator').style.display = 'none';
+        }
+    }
+
     const history = JSON.parse(localStorage.getItem('raccoon_chat_history') || '[]');
     if (history.length > 0) {
         welcomeScreen.style.display = 'none';
