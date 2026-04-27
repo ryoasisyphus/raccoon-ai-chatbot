@@ -1,44 +1,146 @@
-<ProductSpec>
-  <Overview>
-    <Role>Raccoon AI Assistant</Role>
-    <Description>Prototype for an e-commerce customer service bot focusing on usability and zero dead-ends.</Description>
-  </Overview>
-  
-  <TechStack>
-    <Frontend>Vanilla JS, CSS Variables (Glassmorphism)</Frontend>
-    <Backend>Serverless (Google Sheets API via GAS)</Backend>
-    <Fallback>Local JSON (data/faq.json, data/products.json)</Fallback>
-    <Hosting>GitHub Pages</Hosting>
-  </TechStack>
+# AI 客服機器人：產品需求規格書 (Product Spec)
 
-  <DataSchema>
-    <FAQ>category, question, answer</FAQ>
-    <Product>id, name, price, category, desc, image</Product>
-  </DataSchema>
+## 1. 釐清問題 (Discovery Questionnaire)
+以下是在產品啟動初期，針對各利害關係人所設計的關鍵問題與考量：
 
-  <IntentRouting>
-    <Priority level="1" type="FAQ_Match">
-      <Condition>User input matches FAQ keyword.</Condition>
-      <Action>Return predefined answer.</Action>
-    </Priority>
-    <Priority level="2" type="Discovery">
-      <Condition>Intent unclear.</Condition>
-      <Action>Provide contextual suggestion chips.</Action>
-    </Priority>
-    <Priority level="3" type="Recommendation">
-      <Condition>User asks for gifts, shopping, or specific product categories.</Condition>
-      <Action>Render formatted product cards from DB.</Action>
-    </Priority>
-    <Priority level="4" type="Escalation">
-      <Trigger condition="active">FAQ response contains '轉接真人'.</Trigger>
-      <Trigger condition="passive">failCount >= 2.</Trigger>
-      <Action>Inject Handover UI button.</Action>
-    </Priority>
-  </IntentRouting>
+| 編號 | 釐清問題 | 主要利害關係人 | 背後考量 (PM Logic) |
+| :--- | :--- | :--- | :--- |
+| 1 | **核心 KPI 為何？** | 業務主管 | 決定 AI 策略（導購優先 vs 服務優先）。 |
+| 2 | **知識來源為何？** | 工程人員 | 影響 RAG 系統與資料更新機制。 |
+| 3 | **不可回答話題？** | 法務 / 風控 | 設定 AI 安全護欄與負向約束。 |
+| 4 | **真人轉接平台？** | 客服主管 | 決定整合深度（如 Zendesk/LINE）。 |
+| 5 | **商品推薦優先級？** | 營運人員 | 定義推薦算法權重（如庫存/毛利）。 |
+| 6 | **品牌語調 (Tone)？** | 行銷 / 品牌 | 確保 AI 符合品牌形象 (Persona)。 |
+| 7 | **上線節奏為何？** | PM / 業務 | 決定 MVP 範圍與邊界容忍度。 |
+| 8 | **未知意圖處理？** | UX 設計 | 避免使用者陷入無窮迴圈的挫折。 |
+| 9 | **多語系支持？** | 行銷 / 業務 | 決定模型選型與 Embedding 策略。 |
+| 10 | **資安與隱私規範？** | 法務 / 資安 | 決定個資處理與資料存儲策略。 |
 
-  <Constraints>
-    <Boundary>Never respond to political, religious, or legal controversies.</Boundary>
-    <Boundary>Tone must be concise, friendly.</Boundary>
-    <FallbackBehavior>Never crash. Always offer fallback UI options.</FallbackBehavior>
-  </Constraints>
-</ProductSpec>
+---
+
+## 2. 專案概述 (Overview)
+打造一個兼具 FAQ 解答、商品推薦與真人轉接功能的 AI 客服系統。核心目標是以「極簡、直觀」的介面提供高品質的自動化服務。
+
+---
+
+## 2. User Stories
+| ID | 角色 | 行動 (Action) | 預期結果 (Expected Outcome) |
+| :--- | :--- | :--- | :--- |
+| US01 | 一般使用者 | 詢問「運費怎麼計算？」或「退貨流程」 | AI 根據 FAQ 知識庫精準回答，並提供相關連結。 |
+| US02 | 潛在客戶 | 描述需求「我想找適合送給 5 歲小孩的生日禮物」 | AI 推薦 2-3 款商品，包含價格、賣點，並附上購買連結。 |
+| US03 | 遇到困難的使用者 | 輸入「我要退錢」或多次表示不滿意 | AI 自動判斷情緒或意圖，主動跳出「轉接真人客服」的按鈕。 |
+| US04 | 營運人員 | 更新商品清單或 FAQ 內容 | AI 能在下次對話中立即引用最新的資料內容。 |
+
+---
+
+## 3. 功能拆解 (Feature List - MoSCoW) 與 易用性價值 (Usability Rationale)
+
+### Must Have (MVP)
+*   **即時對話介面**：美觀、響應式的聊天視窗。
+    - **價值**：建立品牌信任感，降低使用者進入自動化服務的心理門檻。
+*   **RAG 知識庫檢索**：支援 FAQ (Markdown/JSON 格式)。
+    - **價值**：即時解決問題，省去使用者翻找傳統 FAQ 頁面的時間。
+*   **商品推薦模組**：能從商品清單中選取符合條件的項目。
+    - **價值**：減少決策疲勞，將「搜尋」轉化為「被服務」的購物體驗。
+*   **意圖偵測與引導**：自動區分諮詢、推薦、轉人三種主要行為。
+    - **價值**：在語意不明時提供引導按鈕，避免「我聽不懂」導致的對話中斷。
+*   **動態真人轉接入口**：依條件釋放轉接按鈕。
+    - **價值**：作為最後一道安全網，確保複雜問題一定能被解決。
+
+### Should Have
+*   **對話記錄存檔與摘要**：
+    - **價值**：轉接真人時無須重新描述問題，提升服務連貫性。
+*   **情緒辨識**：
+    - **價值**：主動偵測使用者憤怒，提前介入安撫。
+
+### Could Have
+*   **圖片顯示**：在推薦商品時顯示縮圖。
+*   **多語系自動切換**：根據輸入語言自動切換回應語言。
+
+### Won't Have (Next Phase)
+*   **支付系統整合**：直接在對話視窗內付款。
+*   **語音輸入/輸出**。
+
+---
+
+## 4. 邊界條件與異常處理 (Edge Cases)
+| 情境 (Scenario) | 應對策略 (Strategy) | 預設回應範例 |
+| :--- | :--- | :--- |
+| 無法判斷意圖 | 引導使用者選擇常見標籤 | 「抱歉，我不太確定您的意思。您可以試試詢問『運費』或『推薦商品』嗎？」 |
+| 知識庫查無內容 | 提供最接近的 FAQ 或轉真人 | 「關於這個問題我還在學習中。您可以點擊下方按鈕，由專人為您服務。」 |
+| 商品缺貨中 | 標註「補貨中」，改推薦相似商品 | 「這款目前賣完囉！但我們的 [相似品] 也很受歡迎，要看看嗎？」 |
+| 敏感/違規詞彙 | 系統過濾，拒絕回答，並發出警告 | 「我是 AI 客服助手，請使用理性且尊重的言詞，我們才能更好地協助您。」 |
+| 使用者連續追問不同話題 | 清理 Context 或確認話題切換 | 「好的，那關於 [新話題]，我的建議是...」 |
+| 模型產生幻覺 | 限制回應必須引用知識庫來源 | 「根據我們的政策 [來源連結]，目前的規範是...」 |
+| 轉真人失敗 (非上班時間) | 顯示留言表單並承諾回覆時間 | 「客服目前都在忙線中，請留下您的聯繫方式，我們將在 24 小時內回覆。」 |
+| 網路中斷 | 前端偵測並顯示重試提醒 | 「連線好像有點不穩，請重新輸入一次。」 |
+
+---
+
+## 5. 資料架構 (Data Schema) - [NEW]
+為了確保 Demo 能跑，我們定義以下 mock 資料結構：
+
+### FAQ Schema
+*   `category`: 類別 (e.g., 運費, 退貨)
+*   `question`: 問題內容
+*   `answer`: 回答內容 (支援 Markdown)
+
+### Product Schema
+*   `id`: 唯一代碼
+*   `name`: 名稱
+*   `price`: 價格
+*   `category`: 分類
+*   `features`: 賣點 (Array)
+*   `stock`: 庫存狀態 (Boolean)
+
+---
+
+## 6. 技術方案 (Technical Stack) - [NEW]
+*   **Frontend**: Vanilla JS + CSS (專注於 UI 質感與流暢度)。
+*   **LLM API**: 模擬意圖辨識 (可升級至 Gemini 1.5 Flash)。
+*   **Knowledge Base**: Serverless 架構 (Google Sheets + Google Apps Script API)，並支援本地 JSON Fallback。
+*   **Hosting**: GitHub Pages 部署前端靜態網頁。
+---
+
+## 7. 提示詞與判斷邏輯設計 (Prompt & Logic Design)
+
+### 7.1 Prompt 架構 (假設接入 LLM)
+*   **System Prompt**: 
+    - 角色定義：你是一位友善的 Raccoon 智能助手，服務對象是一般消費者。
+    - 任務：優先使用 `FAQ_DATABASE` 解答問題。若使用者在尋找商品，使用 `PRODUCT_DATABASE` 推薦。
+    - 負向約束：不可回答政治、宗教或法律爭議問題。
+    - 語氣：親切、簡潔，適度使用 Emoji (🦝, ✨, 📦)。
+*   **User Prompt**: 使用者的原始輸入 + 目前的 Context (對話歷史)。
+
+### 7.2 判斷準則 (Decision Criteria)
+1.  **優先級 1 - 精準檢索 (FAQ)**：輸入包含關鍵字 (如：運費、退貨) -> 直接給予標準答案。
+2.  **優先級 2 - 意圖引導 (Discovery)**：語意不明確 (如：你好、這是什麼) -> 顯示猜測問題卡片，引導使用者點擊。
+3.  **優先級 3 - 商品推薦 (Recommend)**：偵測到購買、禮物、推薦意圖 -> 格式化輸出商品卡片。
+4.  **優先級 4 - 真人轉接 (Escalation)**：
+    *   **主動式觸發**：當 FAQ 知識庫回傳的解答內文包含「轉接真人」關鍵字時，自動渲染對應的 UI 按鈕。
+    *   **被動式觸發**：當使用者連續兩次以上輸入無效指令 (`failCount >= 2`) 時，作為安全網觸發轉接機制。
+
+---
+
+## 8. 範例對話案例 (Sample Interactions)
+
+| 類別 | 使用者輸入 (Input) | AI 回應內容 (Output) |
+| :--- | :--- | :--- |
+| **FAQ** | 「運費怎麼算？」 | 「全站單筆訂單滿 **NT$1,000** 即享免運優惠！未達門檻則收取 NT$80 運費。」 |
+| **推薦** | 「我想挑個生日禮物」 | [顯示 3 款商品卡片] 「這是我為您精選的商品，特別推薦『智能感應氣氛燈』，非常適合作為禮物喔！」 |
+| **轉接** | 「我試兩次了都沒解決」 | 「很抱歉讓您感到不便 😅 為了更有效協助您，是否需要為您轉接真人專員？ [立即轉接按鈕]」 |
+
+---
+
+## 9. 待改進與未來發展 (Improvements & Roadmap)
+
+### 產品面 (Product)
+1.  **個人化推薦**：根據使用者的歷史瀏覽記錄，推送更精準的商品。
+2.  **主動式行銷**：在使用者閒置一段時間後，主動發送限時折扣碼。
+3.  **多通路整合**：將此 Web Demo 擴展至 LINE / WhatsApp 介面。
+
+### 技術面 (Technical)
+1.  **接入向量資料庫 (Vector DB)**：將 FAQ 轉為 Vector Embeddings，實現真正的語意搜尋。
+2.  **對話摘要 (Context Management)**：在轉接真人前，自動生成對話摘要給客服專員，提升效率。
+3.  **語音互動 (Voice-to-Text)**：支援消費者直接用說的進行諮詢。
+4.  **性能優化**：優化圖片與資源加載速度，確保手機端秒開。
