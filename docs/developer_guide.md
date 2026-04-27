@@ -12,7 +12,15 @@
 
 ---
 
-## 2. 核心邏輯：意圖辨識 (Intent Handling)
+## 2. 核心開發準則：易用性驅動 (Usability Driven)
+本專案的代碼實作應始終遵循以下心理學準則：
+*   **消滅死胡同 (Zero Dead-ends)**：在 `src/app.js` 中，即使 AI 無法理解意圖，也必須提供引導選項，而非單純的報錯。
+*   **漸進式揭露 (Progressive Disclosure)**：真人客服入口不應常駐，而應在 `failCount` 累積到一定程度時才顯示，避免使用者一開始就放棄 AI 服務。
+*   **質感即信任 (Aesthetics as Trust)**：UI 的樣式調整需保持玻璃擬態風格，因為高品質的視覺能有效降低使用者的防禦心理。
+
+---
+
+## 3. 核心邏輯：意圖辨識 (Intent Handling)
 目前的 `src/app.js` 使用的是基於關鍵字的「模擬意圖辨識」：
 1.  **Exact Match**: 檢查輸入是否包含特定 FAQ 關鍵字。
 2.  **Logic Branching**: 處理推薦請求與真人轉接的計數器 (`failCount`)。
@@ -20,7 +28,7 @@
 
 ---
 
-## 3. 如何接入真實 LLM API (例如 Gemini)
+## 4. 如何接入真實 LLM API (例如 Gemini)
 若要將此原型轉為真實應用，請參考以下步驟：
 1.  **環境設定**: 在後端 (Node.js/Python) 設定 API Key。
 2.  **API 串接**:
@@ -38,13 +46,13 @@
 
 ---
 
-## 4. 數據更新
+## 5. 數據更新
 *   **更新 FAQ**: 修改 `data/faq.json` 中的內容。
 *   **更新商品**: 修改 `data/products.json` 中的項目。
 *   **更新視覺**: 替換 `static/concept.png`。
 
 ---
 
-## 5. 部署建議
+## 6. 部署建議
 *   **前端**: 可直接部署至 Vercel, Netlify 或 GitHub Pages。
 *   **後端**: 若需隱藏 API Key，建議使用 Vercel Functions 或 Cloudflare Workers 作為代理。
