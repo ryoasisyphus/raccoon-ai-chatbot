@@ -32,7 +32,14 @@
         </div>
     </div>
 
-    <div id="typing-indicator">Raccoon 正在輸入中...</div>
+    <!-- 打字狀態指示器 (Skeleton Animation) -->
+    <div id="typing-indicator">
+        <div class="skeleton-bubble">
+            <div class="skeleton-dot"></div>
+            <div class="skeleton-dot"></div>
+            <div class="skeleton-dot"></div>
+        </div>
+    </div>
 
     <div class="quick-actions">
         <div class="action-chip" onclick="handleQuickAction('最新優惠活動')">🎁 最新優惠</div>
@@ -43,6 +50,7 @@
     </div>
 
     <div class="input-area">
+        <button id="voice-btn" title="語音輸入" onclick="startVoice()">🎤</button>
         <input type="text" id="user-input" placeholder="跟我說點什麼吧..." onkeypress="if(event.key === 'Enter') sendMessage()">
         <button id="send-btn" onclick="sendMessage()">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>

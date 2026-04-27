@@ -14,41 +14,124 @@ const PRODUCTS = [
 let failCount = 0;
 const chatWindow = document.getElementById('chat-window');
 const welcomeScreen = document.getElementById('welcome-screen');
+const userInput = document.getElementById('user-input');
 
-function appendMessage(role, content, isHtml = false) {
+const PLACEHOLDERS = [
+    "跟我說點什麼吧...",
+    "試試看：運費怎麼算？",
+    "試試看：我想挑選禮物 ✨",
+    "試試看：如何追蹤訂單？ 📦",
+    "試試看：有哪些會員優惠？ 💎"
+];
+
+function startPlaceholderRotation() {
+    let index = 0;
+    setInterval(() => {
+        index = (index + 1) % PLACEHOLDERS.length;
+        userInput.placeholder = PLACEHOLDERS[index];
+    }, 4000);
+}
+
+// 1. 初始化：載入歷史紀錄與啟動佔位符輪播
+window.onload = () => {
+    startPlaceholderRotation();
+    const history = JSON.parse(localStorage.getItem('raccoon_chat_history') || '[]');
+    if (history.length > 0) {
+        welcomeScreen.style.display = 'none';
+        history.forEach(msg => appendMessage(msg.role, msg.content, msg.isHtml, false));
+    }
+};
+
+// 2. 儲存紀錄到 LocalStorage
+function saveHistory(role, content, isHtml) {
+    const history = JSON.parse(localStorage.getItem('raccoon_chat_history') || '[]');
+    history.push({ role, content, isHtml });
+    localStorage.setItem('raccoon_chat_history', JSON.stringify(history.slice(-20))); // 只存最近 20 條
+}
+
+// 3. 訊息渲染 (支援逐字打字效果)
+async function appendMessage(role, content, isHtml = false, shouldAnimate = true) {
     if (welcomeScreen && welcomeScreen.style.display !== 'none') {
         welcomeScreen.style.display = 'none';
     }
+
     const msgDiv = document.createElement('div');
     msgDiv.className = `message ${role}-msg`;
-    if (isHtml) msgDiv.innerHTML = content;
-    else msgDiv.textContent = content;
     chatWindow.appendChild(msgDiv);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    if (role === 'ai' && shouldAnimate && !isHtml) {
+        // 逐字打字效果
+        let i = 0;
+        const timer = setInterval(() => {
+            msgDiv.textContent += content.charAt(i);
+            i++;
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+            if (i >= content.length) {
+                clearInterval(timer);
+                saveHistory(role, content, isHtml);
+            }
+        }, 30);
+    } else {
+        if (isHtml) msgDiv.innerHTML = content;
+        else msgDiv.textContent = content;
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        if (shouldAnimate) saveHistory(role, content, isHtml);
+    }
 }
 
+// 4. 語音輸入 (Web Speech API)
+window.startVoice = function() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("您的瀏覽器不支援語音辨識 😢");
+        return;
+    }
+    const recognition = new SpeechRecognition();
+    const btn = document.getElementById('voice-btn');
+    
+    recognition.lang = 'zh-TW';
+    recognition.start();
+    btn.classList.add('active');
+
+    recognition.onresult = (event) => {
+        const text = event.results[0][0].transcript;
+        userInput.value = text;
+        btn.classList.remove('active');
+        sendMessage();
+    };
+
+    recognition.onerror = () => btn.classList.remove('active');
+    recognition.onend = () => btn.classList.remove('active');
+};
+
+// 5. 分享/複製商品功能
+window.copyProduct = function(name, price) {
+    const text = `推薦商品：${name}\n價格：NT$ ${price}\n立即查看：https://example.com/raccoon-shop`;
+    navigator.clipboard.writeText(text).then(() => {
+        alert("✅ 商品訊息已複製到剪貼簿！");
+    });
+};
+
 window.handleQuickAction = function(text) {
-    document.getElementById('user-input').value = text;
+    userInput.value = text;
     sendMessage();
 };
 
 window.sendMessage = function() {
-    const input = document.getElementById('user-input');
-    const text = input.value.trim();
+    const text = userInput.value.trim();
     if (!text) return;
 
     appendMessage('user', text);
-    input.value = '';
+    userInput.value = '';
     
     document.getElementById('typing-indicator').style.display = 'block';
     setTimeout(() => {
         document.getElementById('typing-indicator').style.display = 'none';
         processResponse(text);
-    }, 1000);
+    }, 1200);
 };
 
 function processResponse(text) {
-    // 1. 精準匹配
     let found = FAQ.find(f => f.keywords.some(k => text.includes(k)));
     if (found) {
         failCount = 0;
@@ -56,22 +139,25 @@ function processResponse(text) {
         return;
     }
 
-    // 2. 推薦邏輯
     if (text.includes('推薦') || text.includes('禮物') || text.includes('買')) {
         failCount = 0;
         let html = "這是我為您精選的幾款熱門商品：<br>";
         PRODUCTS.forEach(p => {
-            html += `<div class="product-card"><div class="product-name">${p.name}</div><div class="product-price">NT$ ${p.price}</div><div style="font-size:12px; color:#64748b;">${p.desc}</div></div>`;
+            html += `
+                <div class="product-card">
+                    <button class="share-btn" onclick="copyProduct('${p.name}', ${p.price})" title="分享商品">🔗</button>
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">NT$ ${p.price}</div>
+                    <div style="font-size:12px; color:var(--text-muted);">${p.desc}</div>
+                </div>`;
         });
         appendMessage('ai', html, true);
         return;
     }
 
-    // 3. 模糊匹配 / 無法理解的動態引導
     failCount++;
-    
     if (failCount === 1) {
-        let html = "抱議，我不太確定您的意思。您是不是想詢問以下內容？<br>";
+        let html = "抱歉，我不太確定您的意思。您是不是想詢問以下內容？<br>";
         html += `<button class="suggestion-btn" onclick="handleQuickAction('最新優惠活動')">🔎 最近有什麼優惠嗎？</button>`;
         html += `<button class="suggestion-btn" onclick="handleQuickAction('如何追蹤訂單')">🔎 怎麼查看我的包裹進度？</button>`;
         html += `<button class="suggestion-btn" onclick="handleQuickAction('運費怎麼算')">🔎 運費是多少？</button>`;
@@ -90,6 +176,5 @@ window.triggerHandover = function() {
     appendMessage('user', "我要聯繫真人客服");
     setTimeout(() => {
         appendMessage('ai', "好的，正在為您接通客服專員... 請稍候。");
-        alert("系統訊息：已成功發送專員連線請求。");
     }, 800);
 };

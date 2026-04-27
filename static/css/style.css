@@ -7,7 +7,22 @@
     --text-muted: #64748b;
     --ai-bubble: #ffffff;
     --user-bubble: #6366f1;
+    --card-bg: #f8fafc;
+    --border: #e2e8f0;
     --shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.1);
+}
+
+/* 深色模式變數 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+        --glass-bg: rgba(30, 41, 59, 0.85);
+        --text-main: #f1f5f9;
+        --text-muted: #94a3b8;
+        --ai-bubble: #334155;
+        --card-bg: #1e293b;
+        --border: #334155;
+    }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -243,18 +258,59 @@ input:focus {
 #typing-indicator {
     display: none;
     padding: 0 24px 10px;
-    font-size: 12px;
-    color: var(--text-muted);
-    font-style: italic;
+    align-self: flex-start;
+}
+
+.skeleton-bubble {
+    width: 60px;
+    height: 32px;
+    background: var(--ai-bubble);
+    border-radius: 12px;
+    border-bottom-left-radius: 4px;
+    display: flex; align-items: center; justify-content: space-evenly;
+    padding: 0 10px;
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-dot {
+    width: 6px; height: 6px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    opacity: 0.4;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.6; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); }
 }
 
 .product-card {
-    background: #f8fafc;
+    background: var(--card-bg);
     border-radius: 12px;
     padding: 12px;
     margin-top: 10px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border);
+    position: relative;
 }
+
+.share-btn {
+    position: absolute;
+    top: 10px; right: 10px;
+    background: none; border: none;
+    cursor: pointer; font-size: 14px;
+    opacity: 0.6; transition: 0.2s;
+}
+.share-btn:hover { opacity: 1; transform: scale(1.1); }
+
+/* 語音按鈕 */
+#voice-btn {
+    background: none; border: none;
+    font-size: 20px; cursor: pointer;
+    margin-right: 5px; opacity: 0.6;
+    transition: 0.2s;
+}
+#voice-btn.active { color: #ef4444; opacity: 1; animation: blink 1s infinite; }
+@keyframes blink { 50% { opacity: 0.5; } }
 .product-name { font-weight: 700; color: var(--text-main); }
 .product-price { color: #f59e0b; font-weight: 700; font-size: 16px; margin: 4px 0; }
 
