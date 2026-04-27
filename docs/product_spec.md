@@ -97,9 +97,9 @@
 
 ## 6. 技術方案 (Technical Stack) - [NEW]
 *   **Frontend**: Vanilla JS + CSS (專注於 UI 質感與流暢度)。
-*   **LLM API**: Gemini 1.5 Flash (快速、成本低、支援長文本)。
-*   **Knowledge Base**: 靜態 JSON (MVP 階段) -> 可升級至 Vector DB (ChromaDB/Pinecone)。
-*   **Hosting**: Vercel 或 GitHub Pages。
+*   **LLM API**: 模擬意圖辨識 (可升級至 Gemini 1.5 Flash)。
+*   **Knowledge Base**: Serverless 架構 (Google Sheets + Google Apps Script API)，並支援本地 JSON Fallback。
+*   **Hosting**: GitHub Pages 部署前端靜態網頁。
 ---
 
 ## 7. 提示詞與判斷邏輯設計 (Prompt & Logic Design)
@@ -116,7 +116,9 @@
 1.  **優先級 1 - 精準檢索 (FAQ)**：輸入包含關鍵字 (如：運費、退貨) -> 直接給予標準答案。
 2.  **優先級 2 - 意圖引導 (Discovery)**：語意不明確 (如：你好、這是什麼) -> 顯示猜測問題卡片，引導使用者點擊。
 3.  **優先級 3 - 商品推薦 (Recommend)**：偵測到購買、禮物、推薦意圖 -> 格式化輸出商品卡片。
-4.  **優先級 4 - 真人轉接 (Escalation)**：當使用者連續兩次表達不滿、無法解決問題，或明確提到「真人」時，觸發轉接機制。
+4.  **優先級 4 - 真人轉接 (Escalation)**：
+    *   **主動式觸發**：當 FAQ 知識庫回傳的解答內文包含「轉接真人」關鍵字時，自動渲染對應的 UI 按鈕。
+    *   **被動式觸發**：當使用者連續兩次以上輸入無效指令 (`failCount >= 2`) 時，作為安全網觸發轉接機制。
 
 ---
 

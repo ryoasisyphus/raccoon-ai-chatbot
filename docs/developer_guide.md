@@ -8,7 +8,7 @@
 *   `index.html`: 應用的入口點，採用極簡結構。
 *   `src/app.js`: 核心業務邏輯，包含意圖辨識 (Intent detection) 與 UI 交互。
 *   `static/css/style.css`: 全域樣式，基於 CSS Variables 方便快速換膚。
-*   `data/*.json`: 模擬資料庫，包含 FAQ 與商品清單。
+*   `data/*.json`: 本地備用模擬資料庫，當無法連線到 Google Sheets API 時使用。
 
 ---
 
@@ -47,9 +47,9 @@
 ---
 
 ## 5. 數據更新
-*   **更新 FAQ**: 修改 `data/faq.json` 中的內容。
-*   **更新商品**: 修改 `data/products.json` 中的項目。
-*   **更新視覺**: 替換 `static/concept.png`。
+*   **更新 FAQ 與商品**: 請直接至綁定的 [Google Sheets] 工作表 (FAQ 或 Products) 修改內容，前端 `app.js` 會在初始化時自動透過 Google Apps Script (GAS) API 拉取最新資料。
+*   **本地 Fallback 更新**: 若需修改斷線時的預設資料，可手動修改 `data/faq.json` 或 `data/products.json`。
+*   **更新視覺**: 替換 `static/concept.png` 即可改變歡迎畫面插圖。
 
 ---
 
