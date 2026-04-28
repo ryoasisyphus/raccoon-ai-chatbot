@@ -91,9 +91,19 @@ window.onload = async () => {
 
     const history = JSON.parse(localStorage.getItem('raccoon_chat_history') || '[]');
     if (history.length > 0) {
-        welcomeScreen.style.display = 'none';
-        history.forEach(msg => appendMessage(msg.role, msg.content, msg.isHtml, false));
+        // 渲染歷史訊息 (帶入 isHistory=true)
+        history.forEach(msg => appendMessage(msg.role, msg.content, msg.isHtml, false, true));
+        
+        // 插入歷史分隔線
+        const divider = document.createElement('div');
+        divider.className = 'history-divider';
+        divider.innerHTML = '<span>以上為歷史對話</span>';
+        chatWindow.appendChild(divider);
     }
+    
+    // 無論有無歷史，都保持歡迎畫面顯示
+    welcomeScreen.style.display = 'flex';
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 };
 
 function saveHistory(role, content, isHtml) {
@@ -103,8 +113,8 @@ function saveHistory(role, content, isHtml) {
 }
 
 // 3. 訊息渲染 (支援打字效果與滿意度回饋)
-function appendMessage(role, content, isHtml = false, shouldAnimate = true) {
-    if (welcomeScreen && welcomeScreen.style.display !== 'none') {
+function appendMessage(role, content, isHtml = false, shouldAnimate = true, isHistory = false) {
+    if (!isHistory && welcomeScreen && welcomeScreen.style.display !== 'none') {
         welcomeScreen.style.display = 'none';
     }
 
@@ -112,7 +122,7 @@ function appendMessage(role, content, isHtml = false, shouldAnimate = true) {
     msgWrapper.className = `message-wrapper ${role}-wrapper`;
     
     const msgDiv = document.createElement('div');
-    msgDiv.className = `message ${role}-msg`;
+    msgDiv.className = `message ${role}-msg ${isHistory ? 'history-msg' : ''}`;
     msgWrapper.appendChild(msgDiv);
 
     chatWindow.appendChild(msgWrapper);
@@ -267,8 +277,16 @@ window.sendMessage = function() {
 };
 
 function processResponse(text) {
-    // 1. 精準 FAQ
-    let found = FAQ.find(f => f.keywords && f.keywords.some(k => text.includes(k)));
+    const normalizedText = text.toLowerCase().trim();
+
+    // 1. 精準 FAQ 檢索 (Fuzzy Match)
+    let found = FAQ.find(f => {
+        return f.keywords && f.keywords.some(k => {
+            const normalizedK = k.toLowerCase().trim();
+            return normalizedText.includes(normalizedK) || normalizedK.includes(normalizedText);
+        });
+    });
+
     if (found) {
         failCount = 0;
         let answerText = found.answer;
