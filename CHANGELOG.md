@@ -2,6 +2,12 @@
 
 本專案遵循「易用性優先」的原則進行開發。以下是本開發階段的所有變更紀錄：
 
+## [v1.6.2] - 2026-04-28
+
+### 🚀 新增
+- **Agile/Scrum 治理體系**：在 `docs/Development_Governance.md` 中引進 Scrum 的完成定義 (DoD) 與回顧 (Retro) 機制。
+- **治理 Subagent 協議**：建立 `docs/Governance_Subagent_Protocol.md`，定義 `Raccoon-Governor` 角色，支援主動測試情境與風險預警。
+
 ## [v1.6.1] - 2026-04-28
 
 ### 🚀 新增
