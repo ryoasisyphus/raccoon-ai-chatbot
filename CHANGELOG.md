@@ -2,6 +2,11 @@
 
 本專案遵循「易用性優先」的原則進行開發。以下是本開發階段的所有變更紀錄：
 
+## [v1.6.1] - 2026-04-28
+
+### 🚀 新增
+- **分支與工作區治理**：在 `docs/Development_Governance.md` 中新增第 6 章，確立 Git 分支開發與 Worktree 隔離策略，防止 `main` 分支汙染。
+
 ## [v1.6.0] - 2026-04-28 (當前版本)
 ### 💎 專案治理與 UI 巔峰還原 (Governance & UI Restore)
 - **[治理]** 建立 `docs/Development_Governance.md`：定義原子化變更、視覺繼承與 CHANGELOG 強制更新規範。
